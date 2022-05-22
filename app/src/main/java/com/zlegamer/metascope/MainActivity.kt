@@ -1,23 +1,23 @@
 package com.zlegamer.metascope
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import java.util.concurrent.Executors
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import java.util.concurrent.ExecutorService
-import android.os.Build
-import android.util.Size
-import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.zlegamer.metascope.databinding.ActivityMainBinding
 import org.opencv.core.Mat
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), imageProcess, CameraInfoAnalyser {
 
@@ -25,8 +25,11 @@ class MainActivity : AppCompatActivity(), imageProcess, CameraInfoAnalyser {
 
     private lateinit var cameraExecutor: ExecutorService
 
-    external fun initVo(camMatrix: Pair<Float,Float>)
-    external fun vo_tracker(matAddrInput: Long)
+    lateinit var text : String
+
+    external fun initVo(camMatrix: Pair<Double,Double>)
+    external fun vo_tracker(matAddrInput: Long, camMatrix: Pair<Double,Double>) : String
+    external fun getCameraMatrix()
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,8 +60,10 @@ class MainActivity : AppCompatActivity(), imageProcess, CameraInfoAnalyser {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             val focallength = getFocalLength(this);
-            Log.d("fx : ", focallength.toString())
+            Log.d("MainActivity","focal length : ${focallength.toString()}")
             initVo(focallength)
+
+            //getCameraMatrix()
 
             // Preview
             val preview = Preview.Builder()
@@ -70,7 +75,7 @@ class MainActivity : AppCompatActivity(), imageProcess, CameraInfoAnalyser {
             val imageAnalysis = ImageAnalysis.Builder()
                 // enable the following line if RGBA output is needed.
                 // .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
-                .setTargetResolution(Size(800, 600))
+                .setTargetResolution(Size(600, 800))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
@@ -79,7 +84,19 @@ class MainActivity : AppCompatActivity(), imageProcess, CameraInfoAnalyser {
 
                 val rotationDegrees = imageProxy.imageInfo.rotationDegrees
                 var temp : Mat = imageProxy.image!!.yuvToRgba()
-                vo_tracker(temp.getNativeObjAddr())
+                text = vo_tracker(temp.getNativeObjAddr(), focallength)
+                Log.d("테스트 : ", text)
+                //출력부분 다음에 지울것
+                val t: Thread = object : Thread() {
+                    override fun run() {
+                        runOnUiThread {
+                            Log.d("테스트2 : ", text)
+                            viewBinding.textFinder.text = text;
+                        }
+                    }
+                }
+                t.start()
+                //getCameraMatrix()
                 imageProxy.close()
             })
             // Select back camera as a default

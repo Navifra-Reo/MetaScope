@@ -47,3 +47,61 @@ generate_cxx_metadata completed in 48ms
 # C/C++ build system timings
 generate_cxx_metadata 21ms
 
+# C/C++ build system timings
+generate_cxx_metadata
+  [gap of 14ms]
+  create-invalidation-state 11ms
+  [gap of 33ms]
+generate_cxx_metadata completed in 58ms
+
+# C/C++ build system timings
+generate_cxx_metadata 23ms
+
+# C/C++ build system timings
+generate_cxx_metadata
+  generate-extra-metadata-files 10ms
+  [gap of 23ms]
+generate_cxx_metadata completed in 35ms
+
+# C/C++ build system timings
+generate_cxx_metadata
+  [gap of 30ms]
+  generate-extra-metadata-files 10ms
+  [gap of 21ms]
+generate_cxx_metadata completed in 61ms
+
+# C/C++ build system timings
+generate_cxx_metadata 19ms
+
+# C/C++ build system timings
+generate_cxx_metadata 17ms
+
+# C/C++ build system timings
+generate_cxx_metadata 21ms
+
+# C/C++ build system timings
+generate_cxx_metadata 18ms
+
+# C/C++ build system timings
+generate_cxx_metadata 17ms
+
+# C/C++ build system timings
+generate_cxx_metadata 19ms
+
+# C/C++ build system timings
+generate_cxx_metadata 17ms
+
+# C/C++ build system timings
+generate_cxx_metadata
+  [gap of 10ms]
+  create-invalidation-state 10ms
+  [gap of 29ms]
+generate_cxx_metadata completed in 49ms
+
+# C/C++ build system timings
+generate_cxx_metadata
+  [gap of 17ms]
+  generate-extra-metadata-files 10ms
+  [gap of 21ms]
+generate_cxx_metadata completed in 48ms
+

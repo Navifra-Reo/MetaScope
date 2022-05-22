@@ -3,6 +3,7 @@
     package="com.zlegamer.metascope">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -32,20 +33,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Metascope">
         <activity
+            android:name=".LobbyActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape"/>
+        <activity
             android:name=".AuthActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="true"
+            android:screenOrientation="landscape">
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation"
             android:exported="true"
             android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

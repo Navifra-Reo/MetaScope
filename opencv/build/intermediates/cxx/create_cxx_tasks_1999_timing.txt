@@ -1,0 +1,64 @@
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 83ms
+      [gap of 13ms]
+    create-module-model completed in 99ms
+    create-variant-model 14ms
+    create-X86_64-model 24ms
+    create-module-model
+      create-cmake-model 87ms
+    create-module-model completed in 95ms
+    create-variant-model 13ms
+    [gap of 10ms]
+  create-initial-cxx-model completed in 277ms
+create_cxx_tasks completed in 284ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 70ms
+      [gap of 12ms]
+    create-module-model completed in 83ms
+    create-variant-model 14ms
+    create-module-model
+      create-cmake-model 74ms
+    create-module-model completed in 82ms
+    create-variant-model 15ms
+    [gap of 10ms]
+  create-initial-cxx-model completed in 222ms
+create_cxx_tasks completed in 231ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 69ms
+      [gap of 13ms]
+    create-module-model completed in 84ms
+    create-variant-model 13ms
+    create-module-model
+      create-cmake-model 70ms
+    create-module-model completed in 78ms
+    create-variant-model 13ms
+  create-initial-cxx-model completed in 214ms
+create_cxx_tasks completed in 218ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 73ms
+      [gap of 13ms]
+    create-module-model completed in 87ms
+    create-variant-model 14ms
+    create-module-model
+      create-cmake-model 76ms
+    create-module-model completed in 85ms
+    create-variant-model 15ms
+    [gap of 10ms]
+  create-initial-cxx-model completed in 231ms
+create_cxx_tasks completed in 238ms
+
