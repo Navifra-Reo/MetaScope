@@ -2,7 +2,25 @@
 #include "vo_features.h"
 #include <android/log.h>
 
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFSIZE 255
+#define PORT 23
+#define SERVER_DOMAIN "10.0.2.2"
+
 #define MIN_NUM_FEAT 1500
+
+int sock;
+char buf[BUFSIZE];
+
+struct sockaddr_in svr_addr;
+struct hostent *pHostEnt;
+
 //카메라 변수
 Mat camMatrix;
 
@@ -23,6 +41,25 @@ void setFrame()
 {
     prevImage = currImage.clone();
     prevFeatures = currFeatures;
+}
+
+std::string jstring2string(JNIEnv *env, jstring jStr) {
+    if (!jStr)
+        return "";
+
+    const jclass stringClass = env->GetObjectClass(jStr);
+    const jmethodID getBytes = env->GetMethodID(stringClass, "getBytes", "(Ljava/lang/String;)[B");
+    const jbyteArray stringJbytes = (jbyteArray) env->CallObjectMethod(jStr, getBytes, env->NewStringUTF("UTF-8"));
+
+    size_t length = (size_t) env->GetArrayLength(stringJbytes);
+    jbyte* pBytes = env->GetByteArrayElements(stringJbytes, NULL);
+
+    std::string ret = std::string((char *)pBytes, length);
+    env->ReleaseByteArrayElements(stringJbytes, pBytes, JNI_ABORT);
+
+    env->DeleteLocalRef(stringJbytes);
+    env->DeleteLocalRef(stringClass);
+    return ret;
 }
 
 //camMatrix 체크
@@ -61,7 +98,7 @@ pair<double, double> extract_pair(JNIEnv *env, jobject p) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_zlegamer_metascope_MainActivity_initVo(JNIEnv *env, jobject thiz, jobject cam_matrix) {
+Java_com_zlegamer_metascope_MainActivity_initVo(JNIEnv *env, jobject thiz, jobject cam_matrix, jstring room, jstring name) {
 
     isinit=true;
     pair<double,double> focal = extract_pair(env, cam_matrix);
@@ -79,14 +116,48 @@ Java_com_zlegamer_metascope_MainActivity_initVo(JNIEnv *env, jobject thiz, jobje
     t= Mat::zeros(3,1,CV_64FC1);
 
     //getCameraMatrix_();
+
+    // 소켓 열기
+    sock = socket(PF_INET, SOCK_STREAM, 0);
+
+    __android_log_print(ANDROID_LOG_INFO,"socket test", "sock = %d", sock);
+    memset(&svr_addr,0, sizeof(struct sockaddr_in));
+    svr_addr.sin_family = AF_INET;
+    svr_addr.sin_port = htons(PORT);
+    pHostEnt = gethostbyname(SERVER_DOMAIN);
+    svr_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)pHostEnt->h_addr)));
+    connect(sock, (struct sockaddr*)&svr_addr, sizeof(struct sockaddr_in));
+
+    string text = "E" + jstring2string(env, room) + "," + jstring2string(env, name);
+    strcpy(buf,text.c_str());
+    send(sock,buf,sizeof(buf),0);
 }
 
 //vo처리 관련
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_zlegamer_metascope_MainActivity_vo_1tracker(JNIEnv *env, jobject thiz, jlong mat_addr_input, jobject focallength) {
+Java_com_zlegamer_metascope_MainActivity_vo_1tracker(JNIEnv *env, jobject thiz, jlong mat_addr_input, jobject focallength, jboolean victim) {
 
     string text="X = 0\nY = 0\nZ = 0";
+    if(false/**/)
+    {
+        recv(sock,buf,BUFSIZE,0);
+        if(buf[1]!='T')return (*env).NewStringUTF(buf);
+    }
+
+    if(victim)
+    {
+        //맞췄을때
+        double theta = asin(R_f.at<double>(3,1));
+        double phi = atan2(R_f.at<double>(3,2),R_f.at<double>(3,3));
+
+        text = "S"+to_string(phi)+","+ to_string(theta);
+        strcpy(buf,text.c_str());
+        send(sock, buf, sizeof(buf), 0);
+
+        recv(sock,buf,BUFSIZE,0);
+    }
+
     //camMatrix 생성
     pair<double,double> focal = extract_pair(env, focallength);
     double data[]= { focal.first, 0, 300.0, 0, focal.second, 400.0, 0, 0, 1 };
@@ -103,7 +174,7 @@ Java_com_zlegamer_metascope_MainActivity_vo_1tracker(JNIEnv *env, jobject thiz, 
     //첫번째 프레임이면 스킵
     if(isinit)
     {
-        isinit=false;
+        isinit = false;
         __android_log_print(ANDROID_LOG_INFO, "vo", "최초 이미지 사이즈 셋팅");
 
         featureDetection(currImage, currFeatures);
@@ -161,12 +232,12 @@ Java_com_zlegamer_metascope_MainActivity_vo_1tracker(JNIEnv *env, jobject thiz, 
         t_f = t_f + (R_f*t);
         R_f = R*R_f;
     }
-    text = "X = " + to_string(t_f.at<double>(0)) + "\nY = " + to_string(t_f.at<double>(1)) + "\nZ = " + to_string(t_f.at<double>(2));
-    __android_log_print(ANDROID_LOG_INFO, "vo","X = %f",t_f.at<double>(0));
-    __android_log_print(ANDROID_LOG_INFO, "vo","Y = %f",t_f.at<double>(1));
-    __android_log_print(ANDROID_LOG_INFO, "vo","Z = %f",t_f.at<double>(2));
+    text = "P" + to_string(t_f.at<double>(0)) + "," + to_string(t_f.at<double>(1)) + "," + to_string(t_f.at<double>(2));
 
     setFrame();
+
+    strcpy(buf,text.c_str());
+    send(sock, buf, sizeof(buf), 0);
 
     return(*env).NewStringUTF(text.c_str());
 }

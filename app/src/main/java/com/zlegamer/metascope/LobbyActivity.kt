@@ -41,7 +41,6 @@ class LobbyActivity : AppCompatActivity() {
         name = intent.getStringExtra("Name").toString()
         profileImg = intent.getStringExtra("image").toString()
 
-        Log.d("프로필 이미지 주소",profileImg)
         Glide.with(this).load(profileImg).override(200,200).into(viewBinding.imageView)
 
         viewBinding.username.text = name
@@ -49,7 +48,7 @@ class LobbyActivity : AppCompatActivity() {
         //방 정보 업데이트
         if(roomSocket != null) roomSocket!!.disconnect()
         try {
-            roomSocket = IO.socket("http://192.168.1.52:3000")
+            roomSocket = IO.socket("http://168.131.153.28:3000")
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         }
@@ -62,7 +61,7 @@ class LobbyActivity : AppCompatActivity() {
                 jsonObject.addProperty("roomname", roomName);
 
                 roomSocket!!.emit(
-                    "connect",
+                    "enterRoom",
                     gson.toJson(jsonObject)
                 )
                 viewBinding.enter.setVisibility(View.INVISIBLE)
@@ -81,7 +80,7 @@ class LobbyActivity : AppCompatActivity() {
     var whenuserenter = Emitter.Listener { args ->
         runOnUiThread {
             val data: JSONObject = args[0] as JSONObject
-            val msg = data[name].toString()+"님이 입장하셨습니다   "+data["count"]+"/3"
+            val msg = data["name"].toString()+"님이 입장하셨습니다   "+data["count"]+"/3"
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show()
         }
     }
@@ -108,7 +107,7 @@ class LobbyActivity : AppCompatActivity() {
 
                 roomSocket!!.emit(
                     "ready",
-                    gson.toJson({jsonObject})
+                    gson.toJson(jsonObject)
                 )
                 roomSocket!!.on("accept", accpet)
             })
@@ -117,9 +116,11 @@ class LobbyActivity : AppCompatActivity() {
     //게임 시작
     var accpet = Emitter.Listener {
         runOnUiThread(Runnable {
+            roomSocket!!.emit("exitRoom")
             val intent = Intent(this@LobbyActivity, MainActivity::class.java)
             intent.putExtra("Name",name)
             intent.putExtra("Room",roomName)
+            intent.putExtra("Image",profileImg)
             startActivity(intent)
         })
     }

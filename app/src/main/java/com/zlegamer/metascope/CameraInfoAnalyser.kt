@@ -27,8 +27,8 @@ interface CameraInfoAnalyser {
         Log.d("getFocalLength", "sensor size y : ${SensorSize!!.height}")
 
         val focal_length_mm = focal_length_MM.toDouble()
-        val fx =800*focal_length_mm / SensorSize!!.width;
-        val fy =600*focal_length_mm / SensorSize!!.height;
+        val fx =1280*focal_length_mm / SensorSize!!.width;
+        val fy =720*focal_length_mm / SensorSize!!.height;
 
         Log.d("getFocalLength", "focal length: $focal_length_MM")
         Log.d("getFocalLength", "focal length x : $fx")

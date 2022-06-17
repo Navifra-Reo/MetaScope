@@ -31,20 +31,15 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Metascope">
         <activity
             android:name=".LobbyActivity"
             android:exported="false"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="landscape"/>
+           />
         <activity
             android:name=".AuthActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:exported="true"
-            android:screenOrientation="landscape">
-        </activity>
-        <activity
-            android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation"
             android:exported="true"
             android:screenOrientation="landscape">
@@ -53,6 +48,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="true"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 

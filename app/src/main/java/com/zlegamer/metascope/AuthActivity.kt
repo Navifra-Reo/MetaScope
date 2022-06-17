@@ -33,10 +33,10 @@ class AuthActivity : AppCompatActivity() {
         viewBinding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+
         val gso : GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         val account = GoogleSignIn.getLastSignedInAccount(this)
-
         viewBinding.signInButton.setOnClickListener {
             signIn()
         }
